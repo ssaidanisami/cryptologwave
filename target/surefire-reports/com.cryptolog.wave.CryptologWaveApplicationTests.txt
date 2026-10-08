@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.cryptolog.wave.CryptologWaveApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.587 s -- in com.cryptolog.wave.CryptologWaveApplicationTests

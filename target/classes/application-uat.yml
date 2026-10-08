@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:uat-db.cryptologwave.internal}:${DB_PORT:3306}/${DB_NAME:cryptologwave_uat}?createDatabaseIfNotExist=false&useSSL=true&requireSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER:cryptolog_uat_user}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 15
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+      pool-name: UATHikariPool
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER_URI:https://auth-uat.cryptologwave.com/realms/cryptolog}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    com.cryptolog.wave: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.liquibase: INFO

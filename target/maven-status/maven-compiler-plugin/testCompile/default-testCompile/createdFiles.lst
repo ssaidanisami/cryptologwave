@@ -1,0 +1,8 @@
+com\cryptolog\wave\config\SecurityFilterChainIntegrationTest.class
+com\cryptolog\wave\config\security\JwtAuthoritiesConverterTest.class
+com\cryptolog\wave\config\ProfilesConfigurationTest.class
+com\cryptolog\wave\application\service\EmployeeServiceTest.class
+com\cryptolog\wave\config\SecurityConfigTest.class
+com\cryptolog\wave\infrastructure\adapter\input\rest\EmployeeRestControllerIntegrationTest.class
+com\cryptolog\wave\CryptologWaveApplicationTests.class
+com\cryptolog\wave\integration\ExternalApiWireMockTest.class
