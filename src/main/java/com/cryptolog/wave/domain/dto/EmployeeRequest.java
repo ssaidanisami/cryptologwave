@@ -1,5 +1,6 @@
 package com.cryptolog.wave.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ public record EmployeeRequest(
         @NotBlank(message = "First name is mandatory")
         @Size(max = 100, message = "First name must not exceed 100 characters")
         @Schema(example = "John", description = "First name of the employee")
+        @JsonAlias({"name", "firstName"})
         String firstName,
 
         @NotBlank(message = "Last name is mandatory")
@@ -22,7 +24,6 @@ public record EmployeeRequest(
         @Schema(example = "Doe", description = "Last name of the employee")
         String lastName,
 
-        @NotBlank(message = "Email is mandatory")
         @Email(message = "Email must be valid")
         @Size(max = 150, message = "Email must not exceed 150 characters")
         @Schema(example = "john.doe@example.com", description = "Unique email address")
@@ -33,7 +34,6 @@ public record EmployeeRequest(
         @Schema(example = "Engineering", description = "Department the employee belongs to")
         String department,
 
-        @NotBlank(message = "Position is mandatory")
         @Size(max = 100, message = "Position must not exceed 100 characters")
         @Schema(example = "Software Engineer", description = "Job title or position")
         String position,
@@ -43,9 +43,20 @@ public record EmployeeRequest(
         @Schema(example = "75000.00", description = "Annual base salary in USD")
         BigDecimal salary,
 
-        @NotNull(message = "Hire date is mandatory")
         @PastOrPresent(message = "Hire date cannot be in the future")
         @Schema(example = "2024-01-15", description = "Date of hiring (YYYY-MM-DD)")
         LocalDate hireDate
 ) {
+    public EmployeeRequest {
+        if ((email == null || email.isBlank()) && firstName != null && lastName != null) {
+            email = (firstName.trim().toLowerCase() + "." + lastName.trim().toLowerCase() + "@cryptolog.com")
+                    .replaceAll("\\s+", "");
+        }
+        if (position == null || position.isBlank()) {
+            position = "Employee";
+        }
+        if (hireDate == null) {
+            hireDate = LocalDate.now();
+        }
+    }
 }

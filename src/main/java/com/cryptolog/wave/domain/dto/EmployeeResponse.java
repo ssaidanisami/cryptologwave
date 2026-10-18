@@ -1,6 +1,7 @@
 package com.cryptolog.wave.domain.dto;
 
 import com.cryptolog.wave.domain.model.Employee;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,21 +39,10 @@ public record EmployeeResponse(
         @Schema(example = "2024-01-15T09:00:00", description = "Record last update timestamp")
         LocalDateTime updatedAt
 ) {
-    public static EmployeeResponse fromDomain(Employee employee) {
-        if (employee == null) {
-            return null;
+        @JsonProperty("name")
+        @Schema(example = "John", description = "First name / name alias for FE compatibility")
+        public String name() {
+                return firstName;
         }
-        return new EmployeeResponse(
-                employee.id(),
-                employee.firstName(),
-                employee.lastName(),
-                employee.email(),
-                employee.department(),
-                employee.position(),
-                employee.salary(),
-                employee.hireDate(),
-                employee.createdAt(),
-                employee.updatedAt()
-        );
-    }
+        
 }

@@ -111,7 +111,7 @@ docker compose up -d mysql kafka kafka-ui keycloak
 
 | Service | Port | Description |
 |---|---|---|
-| **MySQL** | `3307` (mapped from `3306`) | Database |
+| **MySQL** | `3306` | Database |
 | **Keycloak** | `8081` | IAM / OIDC Provider (admin/admin) |
 | **Kafka** | `9092`, `29092` | Event broker |
 | **Kafka UI** | `8085` | Web dashboard for Kafka |
@@ -155,7 +155,7 @@ The application supports multiple profiles defined in `src/main/resources/`:
 | `SPRING_PROFILES_ACTIVE` | `dev` | Active Spring profile |
 | `PORT` | `8082` | HTTP Server port |
 | `DB_HOST` | `localhost` | MySQL host |
-| `DB_PORT` | `3306` (or `3307` via compose) | MySQL port |
+| `DB_PORT` | `3306` | MySQL port |
 | `DB_NAME` | `cryptologwave_dev` | Database name |
 | `DB_USER` | `root` | Database username |
 | `DB_PASSWORD` | `root` | Database password |

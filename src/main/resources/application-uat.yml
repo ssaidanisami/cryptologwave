@@ -18,6 +18,10 @@ spring:
       hibernate:
         format_sql: false
 
+  liquibase:
+    default-schema: ${DB_NAME:cryptologwave_uat}
+    liquibase-schema: ${DB_NAME:cryptologwave_uat}
+
   security:
     oauth2:
       resourceserver:

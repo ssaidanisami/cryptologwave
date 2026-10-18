@@ -77,9 +77,66 @@ class EmployeeRestControllerIntegrationTest {
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.firstName", is("Grace")))
+                .andExpect(jsonPath("$.name", is("Grace")))
                 .andExpect(jsonPath("$.lastName", is("Hopper")))
+                .andExpect(jsonPath("$.department", is("Engineering")))
                 .andExpect(jsonPath("$.email", is("grace.hopper@example.com")))
                 .andExpect(jsonPath("$.salary", is(120000.00)));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/employees with 'name' payload field from FE model should deserialize properly")
+    void shouldCreateEmployeeWithFrontendNameField() throws Exception {
+        String jsonPayload = """
+                {
+                    "name": "Ada",
+                    "lastName": "Lovelace",
+                    "email": "ada.lovelace@example.com",
+                    "department": "Engineering",
+                    "position": "Mathematician",
+                    "salary": 130000.00,
+                    "hireDate": "2024-01-01"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/employees")
+                        .with(jwt().jwt(builder -> builder.subject("test-user").claim("preferred_username", "testuser")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.name", is("Ada")))
+                .andExpect(jsonPath("$.firstName", is("Ada")))
+                .andExpect(jsonPath("$.lastName", is("Lovelace")))
+                .andExpect(jsonPath("$.department", is("Engineering")))
+                .andExpect(jsonPath("$.salary", is(130000.00)));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/employees with minimal frontend fields (name, lastName, salary, department) should succeed")
+    void shouldCreateEmployeeWithMinimalFrontendPayload() throws Exception {
+        String jsonPayload = """
+                {
+                    "name": "Margaret",
+                    "lastName": "Hamilton",
+                    "department": "Software",
+                    "salary": 140000.00
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/employees")
+                        .with(jwt().jwt(builder -> builder.subject("test-user").claim("preferred_username", "testuser")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.name", is("Margaret")))
+                .andExpect(jsonPath("$.firstName", is("Margaret")))
+                .andExpect(jsonPath("$.lastName", is("Hamilton")))
+                .andExpect(jsonPath("$.department", is("Software")))
+                .andExpect(jsonPath("$.salary", is(140000.00)))
+                .andExpect(jsonPath("$.email", is("margaret.hamilton@cryptolog.com")))
+                .andExpect(jsonPath("$.position", is("Employee")));
     }
 
     @Test
