@@ -10,6 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,5 +50,17 @@ class SecurityFilterChainIntegrationTest {
                                 .claim("preferred_username", "alice")
                                 .claim("roles", "ADMIN"))))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("CORS preflight from the Angular dev server must be accepted without authentication")
+    void shouldAllowCorsPreflightFromFrontendOrigin() throws Exception {
+        mockMvc.perform(options("/api/v1/employees")
+                        .header("Origin", "http://localhost:4200")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "authorization,content-type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:4200"))
+                .andExpect(header().string("Access-Control-Allow-Credentials", "true"));
     }
 }

@@ -2,9 +2,12 @@ package com.cryptolog.wave.infrastructure.adapter.output.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -30,8 +33,9 @@ public class EmployeeJpaEntity {
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(name = "department", nullable = false, length = 100)
-    private String department;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "department_id", nullable = false)
+    private DepartmentJpaEntity department;
 
     @Column(name = "position", nullable = false, length = 100)
     private String position;
@@ -52,7 +56,7 @@ public class EmployeeJpaEntity {
     }
 
     public EmployeeJpaEntity(Long id, String firstName, String lastName, String email,
-                             String department, String position, BigDecimal salary,
+                             DepartmentJpaEntity department, String position, BigDecimal salary,
                              LocalDate hireDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.firstName = firstName;
@@ -110,11 +114,11 @@ public class EmployeeJpaEntity {
         this.email = email;
     }
 
-    public String getDepartment() {
+    public DepartmentJpaEntity getDepartment() {
         return department;
     }
 
-    public void setDepartment(String department) {
+    public void setDepartment(DepartmentJpaEntity department) {
         this.department = department;
     }
 

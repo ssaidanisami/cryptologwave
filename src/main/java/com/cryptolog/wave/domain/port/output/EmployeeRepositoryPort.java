@@ -25,5 +25,7 @@ public interface EmployeeRepositoryPort {
 
     boolean existsByEmailAndIdNot(String email, Long id);
 
+    boolean existsByDepartmentId(Long departmentId);
+
     void delete(Employee employee);
 }

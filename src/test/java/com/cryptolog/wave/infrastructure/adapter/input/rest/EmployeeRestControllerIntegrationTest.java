@@ -256,4 +256,33 @@ class EmployeeRestControllerIntegrationTest {
                         .with(jwt().jwt(builder -> builder.subject("test-user").claim("preferred_username", "testuser"))))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("POST /api/v1/employees with new department should link employee to created department entity")
+    void shouldLinkEmployeeToDepartmentEntity() throws Exception {
+        var request = new EmployeeRequest(
+                "Linus",
+                "Torvalds",
+                "linus@kernel.org",
+                "Kernel Development",
+                "Lead Architect",
+                new BigDecimal("200000.00"),
+                LocalDate.of(2024, 1, 1)
+        );
+
+        mockMvc.perform(post("/api/v1/employees")
+                        .with(jwt().jwt(builder -> builder.subject("test-user").claim("preferred_username", "testuser")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.department", is("Kernel Development")));
+
+        // Query by department
+        mockMvc.perform(get("/api/v1/employees/by-department")
+                        .with(jwt().jwt(builder -> builder.subject("test-user").claim("preferred_username", "testuser")))
+                        .param("department", "Kernel Development"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].firstName", is("Linus")));
+    }
 }

@@ -2,8 +2,10 @@ package com.cryptolog.wave.infrastructure.adapter.output.persistence;
 
 import com.cryptolog.wave.domain.model.Employee;
 import com.cryptolog.wave.domain.port.output.EmployeeRepositoryPort;
+import com.cryptolog.wave.infrastructure.adapter.output.persistence.entity.DepartmentJpaEntity;
 import com.cryptolog.wave.infrastructure.adapter.output.persistence.entity.EmployeeJpaEntity;
 import com.cryptolog.wave.infrastructure.adapter.output.persistence.mapper.EmployeePersistenceMapper;
+import com.cryptolog.wave.infrastructure.adapter.output.persistence.repository.SpringDataDepartmentRepository;
 import com.cryptolog.wave.infrastructure.adapter.output.persistence.repository.SpringDataEmployeeRepository;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -14,19 +16,32 @@ import org.springframework.stereotype.Component;
 public class EmployeePersistenceAdapter implements EmployeeRepositoryPort {
 
     private final SpringDataEmployeeRepository springDataEmployeeRepository;
+    private final SpringDataDepartmentRepository springDataDepartmentRepository;
     private final EmployeePersistenceMapper employeePersistenceMapper;
 
     public EmployeePersistenceAdapter(
             SpringDataEmployeeRepository springDataEmployeeRepository,
+            SpringDataDepartmentRepository springDataDepartmentRepository,
             EmployeePersistenceMapper employeePersistenceMapper
     ) {
         this.springDataEmployeeRepository = springDataEmployeeRepository;
+        this.springDataDepartmentRepository = springDataDepartmentRepository;
         this.employeePersistenceMapper = employeePersistenceMapper;
     }
 
     @Override
     public Employee save(Employee employee) {
         EmployeeJpaEntity jpaEntity = employeePersistenceMapper.toJpaEntity(employee);
+        if (employee.department() != null) {
+            DepartmentJpaEntity departmentEntity = springDataDepartmentRepository
+                    .findByNameIgnoreCase(employee.department().trim())
+                    .orElseGet(() -> {
+                        DepartmentJpaEntity newDept = new DepartmentJpaEntity();
+                        newDept.setName(employee.department().trim());
+                        return springDataDepartmentRepository.save(newDept);
+                    });
+            jpaEntity.setDepartment(departmentEntity);
+        }
         EmployeeJpaEntity savedEntity = springDataEmployeeRepository.save(jpaEntity);
         return employeePersistenceMapper.toDomainEntity(savedEntity);
     }
@@ -45,7 +60,7 @@ public class EmployeePersistenceAdapter implements EmployeeRepositoryPort {
 
     @Override
     public Page<Employee> findByDepartmentIgnoreCase(String department, Pageable pageable) {
-        return springDataEmployeeRepository.findByDepartmentIgnoreCase(department, pageable)
+        return springDataEmployeeRepository.findByDepartment_NameIgnoreCase(department, pageable)
                 .map(employeePersistenceMapper::toDomainEntity);
     }
 
@@ -71,8 +86,14 @@ public class EmployeePersistenceAdapter implements EmployeeRepositoryPort {
     }
 
     @Override
+    public boolean existsByDepartmentId(Long departmentId) {
+        return springDataEmployeeRepository.existsByDepartmentId(departmentId);
+    }
+
+    @Override
     public void delete(Employee employee) {
-        EmployeeJpaEntity jpaEntity = employeePersistenceMapper.toJpaEntity(employee);
-        springDataEmployeeRepository.delete(jpaEntity);
+        if (employee.id() != null) {
+            springDataEmployeeRepository.deleteById(employee.id());
+        }
     }
 }
