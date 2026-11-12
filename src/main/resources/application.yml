@@ -16,5 +16,26 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:cryptolog-wave-group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+app:
+  kafka:
+    topics:
+      employee:
+        name: ${KAFKA_TOPIC_EMPLOYEE_NAME:employee}
+        partitions: ${KAFKA_TOPIC_EMPLOYEE_PARTITIONS:3}
+        replicas: ${KAFKA_TOPIC_EMPLOYEE_REPLICAS:1}
+
 server:
   port: ${PORT:8082}

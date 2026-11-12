@@ -1,6 +1,7 @@
 package com.cryptolog.wave.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Schema(description = "Payload for creating or updating an employee")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record EmployeeRequest(
         @NotBlank(message = "First name is mandatory")
         @Size(max = 100, message = "First name must not exceed 100 characters")

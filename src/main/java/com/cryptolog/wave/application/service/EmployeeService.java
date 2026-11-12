@@ -8,6 +8,7 @@ import com.cryptolog.wave.domain.exception.ResourceNotFoundException;
 import com.cryptolog.wave.domain.mapper.EmployeeMapper;
 import com.cryptolog.wave.domain.model.Employee;
 import com.cryptolog.wave.domain.port.input.EmployeeUseCase;
+import com.cryptolog.wave.domain.port.output.EmployeeEventPublisherPort;
 import com.cryptolog.wave.domain.port.output.EmployeeRepositoryPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +23,16 @@ public class EmployeeService implements EmployeeUseCase {
 
     private final EmployeeRepositoryPort employeeRepositoryPort;
     private final EmployeeMapper employeeMapper;
+    private final EmployeeEventPublisherPort employeeEventPublisherPort;
 
-    public EmployeeService(EmployeeRepositoryPort employeeRepositoryPort, EmployeeMapper employeeMapper) {
+    public EmployeeService(
+            EmployeeRepositoryPort employeeRepositoryPort,
+            EmployeeMapper employeeMapper,
+            EmployeeEventPublisherPort employeeEventPublisherPort
+    ) {
         this.employeeRepositoryPort = employeeRepositoryPort;
         this.employeeMapper = employeeMapper;
+        this.employeeEventPublisherPort = employeeEventPublisherPort;
     }
 
     @Override
@@ -37,7 +44,11 @@ public class EmployeeService implements EmployeeUseCase {
 
         var employee = employeeMapper.toDomain(request);
         var saved = employeeRepositoryPort.save(employee);
-        return employeeMapper.toResponse(saved);
+        var response = employeeMapper.toResponse(saved);
+        if (employeeEventPublisherPort != null) {
+            employeeEventPublisherPort.publishEmployeeCreated(response);
+        }
+        return response;
     }
 
     @Override
@@ -82,7 +93,11 @@ public class EmployeeService implements EmployeeUseCase {
 
         var updatedEmployee = employeeMapper.updateDomain(existing, request);
         var saved = employeeRepositoryPort.save(updatedEmployee);
-        return employeeMapper.toResponse(saved);
+        var response = employeeMapper.toResponse(saved);
+        if (employeeEventPublisherPort != null) {
+            employeeEventPublisherPort.publishEmployeeUpdated(response);
+        }
+        return response;
     }
 
     @Override

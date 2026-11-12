@@ -7,6 +7,7 @@ import com.cryptolog.wave.domain.exception.DuplicateResourceException;
 import com.cryptolog.wave.domain.exception.ResourceNotFoundException;
 import com.cryptolog.wave.domain.mapper.EmployeeMapper;
 import com.cryptolog.wave.domain.model.Employee;
+import com.cryptolog.wave.domain.port.output.EmployeeEventPublisherPort;
 import com.cryptolog.wave.domain.port.output.EmployeeRepositoryPort;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +40,9 @@ class EmployeeServiceTest {
 
     @Mock
     private EmployeeMapper employeeMapper;
+
+    @Mock
+    private EmployeeEventPublisherPort employeeEventPublisherPort;
 
     @InjectMocks
     private EmployeeService employeeService;
@@ -86,7 +91,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("Should create employee successfully when email is unique")
+    @DisplayName("Should create employee successfully and publish Kafka event when email is unique")
     void shouldCreateEmployeeSuccessfully() {
         when(employeeRepositoryPort.existsByEmail(sampleRequest.email())).thenReturn(false);
         when(employeeMapper.toDomain(sampleRequest)).thenReturn(sampleEmployee);
@@ -99,16 +104,19 @@ class EmployeeServiceTest {
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.email()).isEqualTo("john.doe@example.com");
         verify(employeeRepositoryPort).save(sampleEmployee);
+        verify(employeeEventPublisherPort).publishEmployeeCreated(sampleResponse);
     }
 
     @Test
-    @DisplayName("Should throw DuplicateResourceException when email already exists during creation")
+    @DisplayName("Should throw DuplicateResourceException when email already exists during creation and not publish event")
     void shouldThrowDuplicateResourceExceptionWhenEmailExists() {
         when(employeeRepositoryPort.existsByEmail(sampleRequest.email())).thenReturn(true);
 
         assertThatThrownBy(() -> employeeService.createEmployee(sampleRequest))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessageContaining("john.doe@example.com");
+
+        verify(employeeEventPublisherPort, never()).publishEmployeeCreated(any());
     }
 
     @Test
@@ -149,7 +157,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("Should update employee successfully")
+    @DisplayName("Should update employee successfully and publish Kafka event")
     void shouldUpdateEmployeeSuccessfully() {
         Employee updatedEmployee = new Employee(
                 1L,
@@ -175,6 +183,20 @@ class EmployeeServiceTest {
         assertThat(response).isNotNull();
         verify(employeeMapper).updateDomain(sampleEmployee, sampleRequest);
         verify(employeeRepositoryPort).save(updatedEmployee);
+        verify(employeeEventPublisherPort).publishEmployeeUpdated(sampleResponse);
+    }
+
+    @Test
+    @DisplayName("Should throw DuplicateResourceException when email already exists during update and not publish event")
+    void shouldThrowDuplicateResourceExceptionWhenEmailExistsDuringUpdate() {
+        when(employeeRepositoryPort.findById(1L)).thenReturn(Optional.of(sampleEmployee));
+        when(employeeRepositoryPort.existsByEmailAndIdNot(sampleRequest.email(), 1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> employeeService.updateEmployee(1L, sampleRequest))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessageContaining("john.doe@example.com");
+
+        verify(employeeEventPublisherPort, never()).publishEmployeeUpdated(any());
     }
 
     @Test

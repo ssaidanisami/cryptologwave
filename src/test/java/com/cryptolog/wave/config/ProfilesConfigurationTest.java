@@ -31,6 +31,9 @@ class ProfilesConfigurationTest {
         assertThat(source.getProperty("spring.jpa.open-in-view")).isEqualTo(false);
         assertThat(source.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         assertThat(source.getProperty("spring.liquibase.enabled")).isEqualTo(true);
+        assertThat(source.getProperty("spring.kafka.bootstrap-servers")).isEqualTo("${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}");
+        assertThat(source.getProperty("app.kafka.topics.employee.name")).isEqualTo("${KAFKA_TOPIC_EMPLOYEE_NAME:employee}");
+        assertThat(source.getProperty("app.kafka.topics.employee.partitions")).isEqualTo("${KAFKA_TOPIC_EMPLOYEE_PARTITIONS:3}");
     }
 
     @Test
