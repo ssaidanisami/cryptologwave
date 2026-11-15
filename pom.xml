@@ -22,6 +22,7 @@
         <springdoc-openapi.version>2.8.5</springdoc-openapi.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <wiremock.version>3.12.0</wiremock.version>
+        <jasperreports.version>6.21.3</jasperreports.version>
     </properties>
 
     <dependencies>
@@ -83,6 +84,24 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+        </dependency>
+
+        <!-- JasperReports -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>${jasperreports.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lowagie</groupId>
+                    <artifactId>itext</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>1.3.40</version>
         </dependency>
 
         <!-- Testing -->

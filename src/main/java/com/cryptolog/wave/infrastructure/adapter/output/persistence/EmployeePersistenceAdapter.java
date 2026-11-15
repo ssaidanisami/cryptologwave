@@ -7,6 +7,7 @@ import com.cryptolog.wave.infrastructure.adapter.output.persistence.entity.Emplo
 import com.cryptolog.wave.infrastructure.adapter.output.persistence.mapper.EmployeePersistenceMapper;
 import com.cryptolog.wave.infrastructure.adapter.output.persistence.repository.SpringDataDepartmentRepository;
 import com.cryptolog.wave.infrastructure.adapter.output.persistence.repository.SpringDataEmployeeRepository;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +51,13 @@ public class EmployeePersistenceAdapter implements EmployeeRepositoryPort {
     public Optional<Employee> findById(Long id) {
         return springDataEmployeeRepository.findById(id)
                 .map(employeePersistenceMapper::toDomainEntity);
+    }
+
+    @Override
+    public List<Employee> findAll() {
+        return springDataEmployeeRepository.findAll().stream()
+                .map(employeePersistenceMapper::toDomainEntity)
+                .toList();
     }
 
     @Override

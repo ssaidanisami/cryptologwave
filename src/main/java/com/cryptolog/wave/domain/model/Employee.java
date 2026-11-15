@@ -16,4 +16,43 @@ public record Employee(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public BigDecimal getSalary() {
+        return salary;
+    }
+
+    public LocalDate getHireDate() {
+        return hireDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }

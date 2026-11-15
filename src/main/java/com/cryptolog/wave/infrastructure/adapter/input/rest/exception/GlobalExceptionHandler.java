@@ -1,6 +1,7 @@
 package com.cryptolog.wave.infrastructure.adapter.input.rest.exception;
 
 import com.cryptolog.wave.domain.exception.DuplicateResourceException;
+import com.cryptolog.wave.domain.exception.ReportGenerationException;
 import com.cryptolog.wave.domain.exception.ResourceNotFoundException;
 import java.net.URI;
 import java.time.Instant;
@@ -87,6 +88,18 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
         problemDetail.setTitle("Forbidden");
         problemDetail.setType(URI.create("https://cryptologwave.com/errors/forbidden"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ReportGenerationException.class)
+    public ProblemDetail handleReportGenerationException(ReportGenerationException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Report Generation Error");
+        problemDetail.setType(URI.create("https://cryptologwave.com/errors/report-error"));
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
     }

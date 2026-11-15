@@ -1,6 +1,7 @@
 package com.cryptolog.wave.domain.port.output;
 
 import com.cryptolog.wave.domain.model.Employee;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,8 @@ public interface EmployeeRepositoryPort {
     Employee save(Employee employee);
 
     Optional<Employee> findById(Long id);
+
+    List<Employee> findAll();
 
     Page<Employee> findAll(Pageable pageable);
 
